@@ -8,6 +8,7 @@ class Player():
         self.weapon = 5
         self.armor = 0
         self.monsters_slain = 0
+        self.abilities = []
 
     def undraw(self, scr):
         scr.addstr(self.y - 1, self.x, " ", curses.color_pair(1))
@@ -41,4 +42,6 @@ class Player():
         self.max_health += 5
         self.health = self.max_health            
            
+    def addAbility(self, ability):
+        self.abilities.append(ability)       
         

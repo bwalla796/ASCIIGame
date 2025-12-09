@@ -2,6 +2,7 @@ from helpers import print_menu
 from classes.player import Player
 from classes.round import Round
 from classes.monster import Monster
+from collections import Counter
 import curses
 
 def handleCombat(scr, player, monster, stage):
@@ -10,14 +11,24 @@ def handleCombat(scr, player, monster, stage):
     monster.draw(scr)
     monster.renderHealthCounter(scr)
     while monster.health > 0 and player.health > 0:
-        attack_choice = display_combat_menu(scr)
+        attack_choice = display_combat_menu(scr, False, player.abilities)
         display_combat_menu(scr, True)
         if attack_choice == "Attack":
-            monster.health = monster.health - (player.weapon - monster.armor if player.weapon - player.armor > 0 else 0)
+            monster.health = monster.health - (player.weapon - monster.armor if player.weapon - monster.armor > 0 else 0)
+        elif attack_choice == "Fireball":
+            monster.health = monster.health - (25 - monster.armor if player.weapon - monster.armor > 0 else 0)    
         elif attack_choice == "Defend":
             player.armor *= 2
+        elif attack_choice == "Acid Splash":
+            monster.health = monster.health - (player.weapon // 2) 
+        elif attack_choice == "Poison Gas": 
+            monster.health = monster.health - ((player.weapon // 5) - monster.armor if (player.weapon // 5) - monster.armor > 0 else 0) 
+            monster.add_condition("Poisoned")     
 
         if monster.health > 0:
+            conditions_counts = Counter(monster.conditions)
+            #Todo: need to turn conditions into a list of objects that contains the duration of the condition
+            monster.health = monster.health - conditions_counts["Poisoned"]
             player.health = player.health - (monster.weapon - player.armor if monster.weapon - player.armor > 0 else 0)
             if attack_choice == "Defend":
                 player.armor //= 2
@@ -28,8 +39,8 @@ def handleCombat(scr, player, monster, stage):
 
 
 
-def display_combat_menu(stdscr, destroy=False):
-    options = ["Attack", "Defend"]
+def display_combat_menu(stdscr, destroy=False, abilities=[]):
+    options = ["Attack", "Defend"] + abilities
     selected_index = 0
     
     MAX_Y, MAX_X = stdscr.getmaxyx()

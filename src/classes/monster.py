@@ -7,6 +7,7 @@ class Monster():
         self.health = self.max_health
         self.weapon = 3
         self.armor = 0
+        self.conditions = []
 
     def undraw(self, scr):
         scr.addstr(self.y - 1, self.x, " ", curses.color_pair(1))
@@ -35,6 +36,9 @@ class Monster():
         self.weapon += 1
     def improve_health(self):
         self.max_health += 5
-        self.health = self.max_health            
+        self.health = self.max_health   
+
+    def add_condition(self, condition):
+        self.conditions.append(condition)             
            
         

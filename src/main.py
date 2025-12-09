@@ -32,8 +32,11 @@ def main_menu(stdscr):
         elif key == ord('q'):
             return "Quit"
 
-def display_shop_menu(stdscr, destroy=False):
-    options = ["+Weapon", "+Armor", "+Health", "Pass"]
+def display_shop_menu(stdscr, destroy=False, abilities=False):
+    if not abilities:
+        options = ["+Weapon", "+Armor", "+Health", "Pass"]
+    else:
+        options = ["Fireball", "Poison Gas", "Acid Splash", "Pass"]
     selected_index = 0
     
     MAX_Y, MAX_X = stdscr.getmaxyx()
@@ -126,13 +129,19 @@ def main(stdscr):
             else:
                 break  
         else:
-            selected_in_shop = display_shop_menu(stdscr)
-            if selected_in_shop == "+Weapon":
-                player.improve_weapon()
-            elif selected_in_shop == "+Armor":
-                player.improve_armor()
-            elif selected_in_shop == "+Health":
-                player.improve_health()
+            is_boss_round = stage.round_int % 5 == 0
+            selected_in_shop = display_shop_menu(stdscr, False, is_boss_round)
+            if is_boss_round:
+                #Todo: Add upgrades to abilities upon repeat selection
+                if selected_in_shop != "Pass":
+                    player.addAbility(selected_in_shop)
+            else:    
+                if selected_in_shop == "+Weapon":
+                    player.improve_weapon()
+                elif selected_in_shop == "+Armor":
+                    player.improve_armor()
+                elif selected_in_shop == "+Health":
+                    player.improve_health()
             player.health = player.max_health    
             stage.next()
             mon_health += 10 
